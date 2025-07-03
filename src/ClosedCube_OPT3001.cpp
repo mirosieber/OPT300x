@@ -38,7 +38,7 @@ ClosedCube_OPT3001::ClosedCube_OPT3001()
 OPT3001_ErrorCode ClosedCube_OPT3001::begin(uint8_t address) {
 	OPT3001_ErrorCode error = NO_ERROR;
 	_address = address;
-	Wire.begin();
+	Wire.begin(6,7);
 
 	return NO_ERROR;
 }
