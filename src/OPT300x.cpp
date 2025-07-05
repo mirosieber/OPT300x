@@ -126,7 +126,7 @@ OPT300x_ErrorCode OPT300x::readData(uint16_t *data) {
   return NO_ERROR;
 }
 
-OPT300x OPT300x::returnError(OPT300x_ErrorCode error) {
+OPT300x_S OPT300x::returnError(OPT300x_ErrorCode error) {
   OPT300x_S result;
   result.lux = 0;
   result.error = error;
