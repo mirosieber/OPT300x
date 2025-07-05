@@ -1,6 +1,7 @@
 /*
 
-Arduino library for Texas Instruments OPT3001 Digital Ambient Light Sensor
+Arduino/ESP32 library for Texas Instruments OPT300x Digital Ambient Light Sensor
+Famyily Tested on OPT 3001 and 3004
 
 ---
 
@@ -28,92 +29,89 @@ THE SOFTWARE.
 
 */
 
-#ifndef CLOSEDCUBE_OPT3001
-#define CLOSEDCUBE_OPT3001
+#ifndef OPT300x
+#define OPT300x
 
 #include <Arduino.h>
 
 typedef enum {
-	RESULT		= 0x00,
-	CONFIG		= 0x01,
-	LOW_LIMIT	= 0x02,
-	HIGH_LIMIT	= 0x03,
+  RESULT = 0x00,
+  CONFIG = 0x01,
+  LOW_LIMIT = 0x02,
+  HIGH_LIMIT = 0x03,
 
-	MANUFACTURER_ID = 0x7E,
-	DEVICE_ID		= 0x7F,
-} OPT3001_Commands;
-
+  MANUFACTURER_ID = 0x7E,
+  DEVICE_ID = 0x7F,
+} OPT300x_Commands;
 
 typedef enum {
-	NO_ERROR = 0,
-	TIMEOUT_ERROR = -100,
+  NO_ERROR = 0,
+  TIMEOUT_ERROR = -100,
 
-	// Wire I2C translated error codes
-	WIRE_I2C_DATA_TOO_LOG = -10,
-	WIRE_I2C_RECEIVED_NACK_ON_ADDRESS = -20,
-	WIRE_I2C_RECEIVED_NACK_ON_DATA = -30,
-	WIRE_I2C_UNKNOW_ERROR = -40
-} OPT3001_ErrorCode;
-
-typedef union {
-	uint16_t rawData;
-	struct {
-		uint16_t Result : 12;
-		uint8_t Exponent : 4;
-	};
-} OPT3001_ER;
-
+  // Wire I2C translated error codes
+  WIRE_I2C_DATA_TOO_LOG = -10,
+  WIRE_I2C_RECEIVED_NACK_ON_ADDRESS = -20,
+  WIRE_I2C_RECEIVED_NACK_ON_DATA = -30,
+  WIRE_I2C_UNKNOW_ERROR = -40
+} OPT300x_ErrorCode;
 
 typedef union {
-	struct {
-		uint8_t FaultCount : 2;
-		uint8_t MaskExponent : 1;
-		uint8_t Polarity : 1;
-		uint8_t Latch : 1;
-		uint8_t FlagLow : 1;
-		uint8_t FlagHigh : 1;
-		uint8_t ConversionReady : 1;
-		uint8_t OverflowFlag : 1;
-		uint8_t ModeOfConversionOperation : 2;
-		uint8_t ConvertionTime : 1;
-		uint8_t RangeNumber : 4;		
-	};
-	uint16_t rawData;
-} OPT3001_Config;
+  uint16_t rawData;
+  struct {
+    uint16_t Result : 12;
+    uint8_t Exponent : 4;
+  };
+} OPT300x_ER;
 
-struct OPT3001 {
-	float lux;
-	OPT3001_ER raw;
-	OPT3001_ErrorCode error;
+typedef union {
+  struct {
+    uint8_t FaultCount : 2;
+    uint8_t MaskExponent : 1;
+    uint8_t Polarity : 1;
+    uint8_t Latch : 1;
+    uint8_t FlagLow : 1;
+    uint8_t FlagHigh : 1;
+    uint8_t ConversionReady : 1;
+    uint8_t OverflowFlag : 1;
+    uint8_t ModeOfConversionOperation : 2;
+    uint8_t ConvertionTime : 1;
+    uint8_t RangeNumber : 4;
+  };
+  uint16_t rawData;
+} OPT300x_Config;
+
+struct OPT300x {
+  float lux;
+  OPT300x_ER raw;
+  OPT300x_ErrorCode error;
 };
 
-class ClosedCube_OPT3001 {
+class OPT300x {
 public:
-	ClosedCube_OPT3001();
+  OPT300x();
 
-	OPT3001_ErrorCode begin(uint8_t address);
+  OPT300x_ErrorCode begin(uint8_t address);
 
-	uint16_t readManufacturerID();
-	uint16_t readDeviceID();
+  uint16_t readManufacturerID();
+  uint16_t readDeviceID();
 
-	OPT3001 readResult();
-	OPT3001 readHighLimit();
-	OPT3001 readLowLimit();
-	
-	OPT3001_Config readConfig();
-	OPT3001_ErrorCode writeConfig(OPT3001_Config config);
+  OPT300x readResult();
+  OPT300x readHighLimit();
+  OPT300x readLowLimit();
+
+  OPT300x_Config readConfig();
+  OPT300x_ErrorCode writeConfig(OPT300x_Config config);
 
 private:
-	uint8_t _address;
+  uint8_t _address;
 
-	OPT3001_ErrorCode writeData(OPT3001_Commands command);
-	OPT3001_ErrorCode readData(uint16_t* data);
+  OPT300x_ErrorCode writeData(OPT300x_Commands command);
+  OPT300x_ErrorCode readData(uint16_t *data);
 
-	OPT3001 readRegister(OPT3001_Commands command);
-	OPT3001 returnError(OPT3001_ErrorCode error);
+  OPT300x readRegister(OPT300x_Commands command);
+  OPT300x returnError(OPT300x_ErrorCode error);
 
-	float calculateLux(OPT3001_ER er);
+  float calculateLux(OPT300x_ER er);
 };
 
-
-#endif 
+#endif

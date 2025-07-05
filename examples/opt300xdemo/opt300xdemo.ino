@@ -1,8 +1,11 @@
 /*
 
-This is example for ClosedCube OPT3001 Digital Ambient Light Sensor breakout board 
+This is example for OPT300x Digital Ambient Light Sensor Family
+Tested on OPT 3001 and 3004
 
 Initial Date: 02-Dec-2015
+Last Eddit: 05.07.2025 bs MS 	added ESP32 suport generalised frome OPT3001 to
+OPT300x Family
 
 Hardware connections for Arduino Uno:
 VDD to 3.3V DC
@@ -16,105 +19,113 @@ MIT License
 
 */
 
+#include "OPT300x.h"
 #include <Wire.h>
-#include <ClosedCube_OPT3001.h>
 
-ClosedCube_OPT3001 opt3001;
+OPT300x opt300x;
 
-#define OPT3001_ADDRESS 0x45
+#define OPT300x_ADDRESS 0x44
 
-void setup()
-{
-	Serial.begin(9600);
-	Serial.println("ClosedCube OPT3001 Arduino Test");
+// to suport ESP32 pin assignment, I2C pins need to be defined
+#ifdef ESP32
+#define I2C_SDA 6
+#define I2C_SCL 7
+#endif
 
-	opt3001.begin(OPT3001_ADDRESS);
-	Serial.print("OPT3001 Manufacturer ID");
-	Serial.println(opt3001.readManufacturerID());
-	Serial.print("OPT3001 Device ID");
-	Serial.println(opt3001.readDeviceID());
+void setup() {
+  Serial.begin(115200);
+  delay(2000);
+  Serial.println("OPT300x Test");
+  delay(2000);
+#ifdef ESP32
+  Wire.begin(I2C_SDA, I2C_SCL);
+#else
+  Wire.begin();
+#endif
+  opt300x.begin(OPT300x_ADDRESS);
+  Serial.print("OPT300x Manufacturer ID");
+  Serial.println(opt300x.readManufacturerID());
+  Serial.print("OPT300x Device ID");
+  Serial.println(opt300x.readDeviceID());
 
-	configureSensor();
-	printResult("High-Limit", opt3001.readHighLimit());
-	printResult("Low-Limit", opt3001.readLowLimit());
-	Serial.println("----");
+  configureSensor();
+  printResult("High-Limit", opt300x.readHighLimit());
+  printResult("Low-Limit", opt300x.readLowLimit());
+  Serial.println("----");
 }
 
-void loop()
-{
-	OPT3001 result = opt3001.readResult();
-	printResult("OPT3001", result);
-	delay(500);
+void loop() {
+  OPT300x result = opt300x.readResult();
+  printResult("OPT300x", result);
+  delay(500);
 }
 
 void configureSensor() {
-	OPT3001_Config newConfig;
-	
-	newConfig.RangeNumber = B1100;	
-	newConfig.ConvertionTime = B0;
-	newConfig.Latch = B1;
-	newConfig.ModeOfConversionOperation = B11;
+  OPT300x_Config newConfig;
 
-	OPT3001_ErrorCode errorConfig = opt3001.writeConfig(newConfig);
-	if (errorConfig != NO_ERROR)
-		printError("OPT3001 configuration", errorConfig);
-	else {
-		OPT3001_Config sensorConfig = opt3001.readConfig();
-		Serial.println("OPT3001 Current Config:");
-		Serial.println("------------------------------");
-		
-		Serial.print("Conversion ready (R):");
-		Serial.println(sensorConfig.ConversionReady,HEX);
+  newConfig.RangeNumber = B1100;
+  newConfig.ConvertionTime = B0;
+  newConfig.Latch = B1;
+  newConfig.ModeOfConversionOperation = B11;
 
-		Serial.print("Conversion time (R/W):");
-		Serial.println(sensorConfig.ConvertionTime, HEX);
+  OPT300x_ErrorCode errorConfig = opt300x.writeConfig(newConfig);
+  if (errorConfig != NO_ERROR)
+    printError("OPT300x configuration", errorConfig);
+  else {
+    OPT300x_Config sensorConfig = opt300x.readConfig();
+    Serial.println("OPT300x Current Config:");
+    Serial.println("------------------------------");
 
-		Serial.print("Fault count field (R/W):");
-		Serial.println(sensorConfig.FaultCount, HEX);
+    Serial.print("Conversion ready (R):");
+    Serial.println(sensorConfig.ConversionReady, HEX);
 
-		Serial.print("Flag high field (R-only):");
-		Serial.println(sensorConfig.FlagHigh, HEX);
+    Serial.print("Conversion time (R/W):");
+    Serial.println(sensorConfig.ConvertionTime, HEX);
 
-		Serial.print("Flag low field (R-only):");
-		Serial.println(sensorConfig.FlagLow, HEX);
+    Serial.print("Fault count field (R/W):");
+    Serial.println(sensorConfig.FaultCount, HEX);
 
-		Serial.print("Latch field (R/W):");
-		Serial.println(sensorConfig.Latch, HEX);
+    Serial.print("Flag high field (R-only):");
+    Serial.println(sensorConfig.FlagHigh, HEX);
 
-		Serial.print("Mask exponent field (R/W):");
-		Serial.println(sensorConfig.MaskExponent, HEX);
+    Serial.print("Flag low field (R-only):");
+    Serial.println(sensorConfig.FlagLow, HEX);
 
-		Serial.print("Mode of conversion operation (R/W):");
-		Serial.println(sensorConfig.ModeOfConversionOperation, HEX);
+    Serial.print("Latch field (R/W):");
+    Serial.println(sensorConfig.Latch, HEX);
 
-		Serial.print("Polarity field (R/W):");
-		Serial.println(sensorConfig.Polarity, HEX);
+    Serial.print("Mask exponent field (R/W):");
+    Serial.println(sensorConfig.MaskExponent, HEX);
 
-		Serial.print("Overflow flag (R-only):");
-		Serial.println(sensorConfig.OverflowFlag, HEX);
+    Serial.print("Mode of conversion operation (R/W):");
+    Serial.println(sensorConfig.ModeOfConversionOperation, HEX);
 
-		Serial.print("Range number (R/W):");
-		Serial.println(sensorConfig.RangeNumber, HEX);
+    Serial.print("Polarity field (R/W):");
+    Serial.println(sensorConfig.Polarity, HEX);
 
-		Serial.println("------------------------------");
-	}
-	
+    Serial.print("Overflow flag (R-only):");
+    Serial.println(sensorConfig.OverflowFlag, HEX);
+
+    Serial.print("Range number (R/W):");
+    Serial.println(sensorConfig.RangeNumber, HEX);
+
+    Serial.println("------------------------------");
+  }
 }
 
-void printResult(String text, OPT3001 result) {
-	if (result.error == NO_ERROR) {
-		Serial.print(text);
-		Serial.print(": ");
-		Serial.print(result.lux);
-		Serial.println(" lux");
-	}
-	else {
-		printError(text,result.error);
-	}
+void printResult(String text, OPT300x result) {
+  if (result.error == NO_ERROR) {
+    Serial.print(text);
+    Serial.print(": ");
+    Serial.print(result.lux);
+    Serial.println(" lux");
+  } else {
+    printError(text, result.error);
+  }
 }
 
-void printError(String text, OPT3001_ErrorCode error) {
-	Serial.print(text);
-	Serial.print(": [ERROR] Code #");
-	Serial.println(error);
+void printError(String text, OPT300x_ErrorCode error) {
+  Serial.print(text);
+  Serial.print(": [ERROR] Code #");
+  Serial.println(error);
 }
