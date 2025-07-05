@@ -55,7 +55,7 @@ void setup() {
 }
 
 void loop() {
-  OPT300x result = opt300x.readResult();
+  OPT300x_S result = opt300x.readResult();
   printResult("OPT300x", result);
   delay(500);
 }
@@ -113,7 +113,7 @@ void configureSensor() {
   }
 }
 
-void printResult(String text, OPT300x result) {
+void printResult(String text, OPT300x_S result) {
   if (result.error == NO_ERROR) {
     Serial.print(text);
     Serial.print(": ");
