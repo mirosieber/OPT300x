@@ -73,16 +73,16 @@ OPT300x_ErrorCode OPT300x::writeConfig(OPT300x_Config config) {
   return (OPT300x_ErrorCode)(-10 * Wire.endTransmission());
 }
 
-OPT300x OPT300x::readResult() { return readRegister(RESULT); }
+OPT300x_S OPT300x::readResult() { return readRegister(RESULT); }
 
-OPT300x OPT300x::readHighLimit() { return readRegister(HIGH_LIMIT); }
+OPT300x_S OPT300x::readHighLimit() { return readRegister(HIGH_LIMIT); }
 
-OPT300x OPT300x::readLowLimit() { return readRegister(LOW_LIMIT); }
+OPT300x_S OPT300x::readLowLimit() { return readRegister(LOW_LIMIT); }
 
-OPT300x OPT300x::readRegister(OPT300x_Commands command) {
+OPT300x_S OPT300x::readRegister(OPT300x_Commands command) {
   OPT300x_ErrorCode error = writeData(command);
   if (error == NO_ERROR) {
-    OPT300x result;
+    OPT300x_S result;
     result.lux = 0;
     result.error = NO_ERROR;
 
@@ -127,7 +127,7 @@ OPT300x_ErrorCode OPT300x::readData(uint16_t *data) {
 }
 
 OPT300x OPT300x::returnError(OPT300x_ErrorCode error) {
-  OPT300x result;
+  OPT300x_S result;
   result.lux = 0;
   result.error = error;
   return result;
