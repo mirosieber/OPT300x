@@ -29,8 +29,8 @@ THE SOFTWARE.
 
 */
 
-#ifndef OPT300x
-#define OPT300x
+#ifndef _OPT300x_H_
+#define _OPT300x_H_
 
 #include <Arduino.h>
 
@@ -80,7 +80,7 @@ typedef union {
   uint16_t rawData;
 } OPT300x_Config;
 
-struct OPT300x {
+struct OPT300x_S {
   float lux;
   OPT300x_ER raw;
   OPT300x_ErrorCode error;
@@ -95,9 +95,9 @@ public:
   uint16_t readManufacturerID();
   uint16_t readDeviceID();
 
-  OPT300x readResult();
-  OPT300x readHighLimit();
-  OPT300x readLowLimit();
+  OPT300x_S readResult();
+  OPT300x_S readHighLimit();
+  OPT300x_S readLowLimit();
 
   OPT300x_Config readConfig();
   OPT300x_ErrorCode writeConfig(OPT300x_Config config);
@@ -108,8 +108,8 @@ private:
   OPT300x_ErrorCode writeData(OPT300x_Commands command);
   OPT300x_ErrorCode readData(uint16_t *data);
 
-  OPT300x readRegister(OPT300x_Commands command);
-  OPT300x returnError(OPT300x_ErrorCode error);
+  OPT300x_S readRegister(OPT300x_Commands command);
+  OPT300x_S returnError(OPT300x_ErrorCode error);
 
   float calculateLux(OPT300x_ER er);
 };
